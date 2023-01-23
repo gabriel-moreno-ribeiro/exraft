@@ -12,4 +12,6 @@ jobs:
       - run: mix format --check-formatted
       - run: mix compile --warnings-as-errors
       - run: mix test
-      - run: mix run -e 'ids = Raft.start(["a","b","c"]); {:ok, l} = Raft.Cluster.wait_for_leader(ids); {:ok, _} = Raft.Server.command(l, {:put, :answer, 42}); IO.inspect(Raft.Server.read(l, :answer), label: "read from leader")'
+      - name: smoke test a three-node cluster
+        run: |
+          mix run -e 'ids = Raft.start(["a","b","c"]); {:ok, l} = Raft.Cluster.wait_for_leader(ids); {:ok, _} = Raft.Server.command(l, {:put, :answer, 42}); IO.inspect(Raft.Server.read(l, :answer), label: "read from leader")'
