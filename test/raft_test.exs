@@ -121,10 +121,23 @@ defmodule RaftTest do
     Process.sleep(700)
     Network.heal()
     assert {:ok, _} = Cluster.wait_for_leader(ids)
-    terms2 = Enum.map(ids, &Server.info(&1).term)
+    # the healed node learns the new term from the next heartbeat, so give it a moment
+    all_same? = &(length(Enum.uniq(&1)) == 1)
+    terms2 = wait_until(fn -> Enum.map(ids, &Server.info(&1).term) end, all_same?)
     assert Enum.max(terms2) >= Enum.max(terms1)
     assert length(Enum.uniq(terms2)) == 1, "everyone converges on the same term"
     Cluster.stop(ids)
+  end
+
+  defp wait_until(get, ok?, tries \\ 50) do
+    value = get.()
+
+    if ok?.(value) or tries == 0 do
+      value
+    else
+      Process.sleep(100)
+      wait_until(get, ok?, tries - 1)
+    end
   end
 
   test "a single node cluster commits on its own" do
