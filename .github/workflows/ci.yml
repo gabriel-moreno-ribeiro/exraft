@@ -4,11 +4,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: "25"
-          elixir-version: "1.14"
+          otp-version: "27"
+          elixir-version: "1.18"
       - run: mix format --check-formatted
       - run: mix compile --warnings-as-errors
       - run: mix test

@@ -200,7 +200,8 @@ defmodule Raft.Server do
 
     grant = term == state.term and state.voted_for in [nil, candidate] and up_to_date
 
-    state = if grant, do: %{state | voted_for: candidate} |> reset_election_timer(), else: state
+    state =
+      if grant, do: %{state | voted_for: candidate} |> reset_election_timer(), else: state
 
     Raft.Network.send(state.id, candidate, {:request_vote_reply, state.term, grant, state.id})
     {:noreply, state}
